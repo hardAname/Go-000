@@ -10,8 +10,10 @@ func invokeDao(callNum int) {
 	d := dao.DaoA{}
 	target, err := d.FindTargetByNum(callNum)
 	if err != nil{
-		fmt.Printf("DaoA num:%d error:%T %v\n",callNum, errors.Cause(err), errors.Cause(err))
-		fmt.Printf("Stack Trace:\n%+v\n", err)
+		if errors.Is(err, dao.DaoErrNoRows){
+			fmt.Printf("DaoA num:%d error:%v\n",callNum, errors.Cause(err))
+			fmt.Printf("Stack Trace:\n%+v\n", err)
+		}
 		return
 	}
 	fmt.Printf("DaoA num:%d, got result:%s\n",callNum, target.Content)

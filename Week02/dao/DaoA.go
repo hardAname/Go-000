@@ -2,9 +2,14 @@ package dao
 
 import (
 	"Go-000/Week02/dao/mockSql"
+	"fmt"
 	"github.com/pkg/errors"
-	"strconv"
 )
+
+var (
+	DaoErrNoRows = errors.New("Query::no rows")
+)
+
 // 模拟dao层某个业务模块调用的结构
 type DaoA struct{
 	db 	*mockSql.Db
@@ -28,7 +33,9 @@ func (dao *DaoA) FindTargetByNum(num int) (*TargetStr, error){
 		rows, err = dao.db.Query("执行某些特定的sql")
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "FindTargetByNum:" + strconv.Itoa(num))
+		if errors.Is(err, mockSql.ErrNoRows) {
+			return nil, errors.Wrap(DaoErrNoRows, fmt.Sprintf("sql error:%v", err))
+		}
 	}
 	return &TargetStr{Content:rows.Scan()}, nil
 }
